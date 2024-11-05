@@ -1,7 +1,7 @@
 const Groq = require('groq-sdk');
 const axios = require('axios');
 
-const randomKey = "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"
+const randomKey = "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";
 const groq = new Groq({ apiKey: randomKey });
 let chatHistory = [];
 
@@ -18,7 +18,7 @@ const handleChat = async (req, res, systemMessage) => {
                 messages: [
                     { role: "system", content: systemMessage },
                     ...messages.map(msg => ({ role: msg.role, content: msg.content })),
-  { role: "user", content: prompt },
+                    { role: "user", content: prompt },
                     aiMessage ? { role: "system", content: aiMessage } : null
                 ].filter(Boolean)
             };
@@ -26,7 +26,7 @@ const handleChat = async (req, res, systemMessage) => {
             const response = await groq.chat.completions.create({
                 messages: payload.messages,
                 model: "llama3-70b-8192",
-                temperature: 0.5,
+                temperature: 1,
                 max_tokens: 1024,
                 top_p: 1,
                 stream: false,
@@ -43,11 +43,13 @@ const handleChat = async (req, res, systemMessage) => {
             assistantMessage.content = assistantMessage.content.replace(/\n\n/g, '\n    ');
             assistantMessage.content = assistantMessage.content.replace(/\*\*/g, '*');
 
-            await axios.post(`https://copper-ambiguous-velvet.glitch.me/write/${userId}`, {
-                json: { [userId]: chatHistory }
-            });
+            if (userId) {
+                await axios.post(`https://copper-ambiguous-velvet.glitch.me/write/${userId}`, {
+                    json: { [userId]: chatHistory }
+                });
+            }
 
-            res.json({ result: assistantMessage.content, history: `https://copper-ambiguous-velvet.glitch.me/read/${userId}` });
+            res.json({ result: assistantMessage.content, history: userId ? `https://copper-ambiguous-velvet.glitch.me/read/${userId}` : null });
             return true;
         } catch (error) {
             return false;
@@ -56,13 +58,18 @@ const handleChat = async (req, res, systemMessage) => {
 
     try {
         let readResponse = { data: {} };
-       try {
-            readResponse = await axios.get(`https://copper-ambiguous-velvet.glitch.me/read/${userId}`);
-        } catch (error) {
-            await axios.post(`https://copper-ambiguous-velvet.glitch.me/write/${userId}`, { json: { [userId]: [] } });
-            readResponse.data = {};
+
+        if (userId) {
+            try {
+                readResponse = await axios.get(`https://copper-ambiguous-velvet.glitch.me/read/${userId}`);
+            } catch (error) {
+                await axios.post(`https://copper-ambiguous-velvet.glitch.me/write/${userId}`, { json: { [userId]: [] } });
+                readResponse.data = {};
+            }
+            chatHistory = readResponse.data[userId] || [];
+        } else {
+            chatHistory = []; // Empty history for anonymous users
         }
-        chatHistory = readResponse.data[userId] || [];
 
         let success = await sendRequest(20);
         if (!success) success = await sendRequest(15);
@@ -74,9 +81,11 @@ const handleChat = async (req, res, systemMessage) => {
         }
         if (!success) throw new Error('All retries failed');
     } catch (error) {
-        await axios.post(`https://copper-ambiguous-velvet.glitch.me/write/${userId}`, {
-            json: { [userId]: [] }
-        });
+        if (userId) {
+            await axios.post(`https://copper-ambiguous-velvet.glitch.me/write/${userId}`, {
+                json: { [userId]: [] }
+            });
+        }
         console.error('Error request:', error);
         res.status(200).json({ result: 'Hello new user👋🏻' });
     }
