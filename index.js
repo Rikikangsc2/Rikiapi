@@ -1,6 +1,6 @@
 const express = require('express');
 const llama = require("./api/llama.js");
-
+const sistem = require("./api/sistem.js");
 const app = express();
 
 app.use(express.json({
@@ -30,12 +30,15 @@ app.use((req, res, next) => {
   next();
 });
 
+
 app.get('/', (req, res) =>{
   if (!req.query.enc) return res.json({message: "Masukkan parameter enc"})
   const decoded = Buffer.from(req.query.enc, 'base64').toString('utf8');
   res.json(decoded);
 })
-
+app.get('/system',async (req, res)=>{
+  await sistem.alic(req, res);
+})
 app.get('/llama', async (req, res) => {
   await llama.handleChat(req, res);
 });
