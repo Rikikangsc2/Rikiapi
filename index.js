@@ -2,6 +2,8 @@ const express = require('express');
 const llama = require("./api/llama.js");
 const sistem = require("./api/sistem.js");
 const app = express();
+const { ytdown } = require("nayan-media-downloader");
+const play = require("./api/play.js");
 
 app.use(express.json({
   reviver: (key, value) => {
@@ -29,19 +31,16 @@ app.use((req, res, next) => {
   };
   next();
 });
-
+//Router
+app.get('/llama', llama.handleChat);
+app.get('/sistem', sistem.alic);
+app.get('/play', play);
 
 app.get('/', (req, res) =>{
   if (!req.query.enc) return res.json({message: "Masukkan parameter enc"})
   const decoded = Buffer.from(req.query.enc, 'base64').toString('utf8');
   res.json(decoded);
 })
-app.get('/system',async (req, res)=>{
-  await sistem.alic(req, res);
-})
-app.get('/llama', async (req, res) => {
-  await llama.handleChat(req, res);
-});
 
 // Global error handler
 app.use((err, req, res, next) => {
