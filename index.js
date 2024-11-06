@@ -2,7 +2,6 @@ const express = require('express');
 const llama = require("./api/llama.js");
 const sistem = require("./api/sistem.js");
 const app = express();
-const { ytdown } = require("nayan-media-downloader");
 const play = require("./api/play.js");
 
 app.use(express.json({

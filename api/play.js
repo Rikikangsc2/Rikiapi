@@ -3,26 +3,26 @@ const axios = require("axios");
 
 module.exports = async (req, res) => {
   try {
-    // Ambil query dari parameter request
     const query = req.query.query;
-
-    // Panggil API YTS untuk mencari video dengan query
     const ytsResponse = await axios.get(`https://itzpire.com/search/youtube?query=${encodeURIComponent(query)}`);
 
-    // Pastikan API YTS mengembalikan data video
-    if (ytsResponse.data && ytsResponse.data.status === "success" && ytsResponse.data.data.length > 0) {
-      // Ambil URL video pertama dari hasil pencarian
-      const videoUrl = ytsResponse.data.data[0].url;
+    if (ytsResponse.data && ytsResponse.data.status === "success") {
+      const videos = ytsResponse.data.data.filter(video => video.duration.seconds <= 600);
 
-      // Download video menggunakan Nayan media downloader
-      const downloadUrl = await ytdown(videoUrl);
-
-      // Kirimkan URL hasil download dalam response JSON
-      res.json({
-        status: "success",
-        message: "Video downloaded successfully",
-        downloadUrl: downloadUrl
-      });
+      if (videos.length > 0) {
+        const videoUrl = videos[0].url;
+        const downloadUrl = await ytdown(videoUrl);
+        res.json({
+          status: "success",
+          message: "Video downloaded successfully",
+          downloadUrl: downloadUrl
+        });
+      } else {
+        res.status(404).json({
+          status: "error",
+          message: "No videos found under 10 minutes for the given query"
+        });
+      }
     } else {
       res.status(404).json({
         status: "error",
