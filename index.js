@@ -4,6 +4,7 @@ const sistem = require("./api/sistem.js");
 const app = express();
 const play = require("./api/play.js");
 
+app.set('json spaces', 2);
 app.use(express.json({
   reviver: (key, value) => {
     if (value === null) {

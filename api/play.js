@@ -14,13 +14,7 @@ module.exports = async (req, res) => {
 
       if (videos.length > 0) {
         const videoUrl = videos[0].url;
-        const downloadResponse = await axios.get(`https://purapi.koyeb.app/api/v1/ytdl?url=${encodeURIComponent(videoUrl)}`, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36'
-          }
-        });
-
-        res.json(downloadResponse.data);
+        res.json({audio: `https://purapi.koyeb.app/yt?type=mp3&url=${videoUrl}`, video: `https://purapi.koyeb.app/yt?type=mp4&url=${videoUrl}`,data:videos[0]})
       } else {
         res.status(404).json({
           status: "error",
@@ -37,7 +31,7 @@ module.exports = async (req, res) => {
     console.error(error);
     res.status(500).json({
       status: "error",
-      message: "An error occurred while processing the request"
+      message: error.message
     });
   }
 };
