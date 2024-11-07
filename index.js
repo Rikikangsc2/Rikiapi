@@ -35,6 +35,7 @@ app.use((req, res, next) => {
 app.get('/llama', llama.handleChat);
 app.get('/sistem', sistem.alic);
 app.get('/play', play);
+app.get('/gemini', (req, res) => res.redirect(`https://purapi.koyeb.app/gemini?text=${req.query.text || ''}&systemPrompt=${req.query.systemPrompt || ''}&user=${req.query.user || ''}`));
 
 app.get('/', (req, res) =>{
   if (!req.query.enc) return res.json({message: "Masukkan parameter enc"})
