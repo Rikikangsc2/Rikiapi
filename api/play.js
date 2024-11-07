@@ -7,10 +7,6 @@ module.exports = async (req, res) => {
 
     // Akses properti 'all' untuk mendapatkan semua hasil video
     const videos = r.all.filter(video => video.type === 'video'); 
-
-    // Urutkan video berdasarkan durasi (ascending)
-    videos.sort((a, b) => a.seconds - b.seconds);
-
     // Ambil video pertama yang durasinya kurang dari atau sama dengan 10 menit (600 detik)
     const video = videos.find(video => video.seconds <= 600);
 
