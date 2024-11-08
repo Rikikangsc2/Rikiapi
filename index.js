@@ -36,12 +36,7 @@ app.get('/llama', llama.handleChat);
 app.get('/sistem', sistem.alic);
 app.get('/play', play);
 app.get('/gemini', (req, res) => res.redirect(`https://purapi.koyeb.app/gemini?text=${req.query.text || ''}&systemPrompt=${req.query.systemPrompt || ''}&user=${req.query.user || ''}`));
-
-app.get('/', (req, res) =>{
-  if (!req.query.enc) return res.json({message: "Masukkan parameter enc"})
-  const decoded = Buffer.from(req.query.enc, 'base64').toString('utf8');
-  res.json(decoded);
-})
+app.get('/aio', (req, res) => res.redirect(`https://purapi.koyeb.app/aio?url=${req.query.url}`))
 
 // Global error handler
 app.use((err, req, res, next) => {
