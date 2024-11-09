@@ -35,7 +35,7 @@ app.use((req, res, next) => {
 app.get('/llama', llama.handleChat);
 app.get('/sistem', sistem.alic);
 app.get('/play', play);
-app.get('/gemini', (req, res) => res.redirect(`https://purapi.koyeb.app/gemini?text=${req.query.text || ''}&systemPrompt=${req.query.systemPrompt || ''}&user=${req.query.user || ''}`));
+app.get('/gemini', (req, res) => res.redirect(`https://purapi.koyeb.app/gemini?text=${req.query.text || ''}&systemPrompt=${req.query.systemPrompt || ''}&user=${req.query.user || ''}&url=${req.query.url || ''}`));
 app.get('/aio', (req, res) => res.redirect(`https://purapi.koyeb.app/aio?url=${req.query.url}`))
 
 // Global error handler
